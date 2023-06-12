@@ -1,36 +1,94 @@
+axios.defaults.headers.common['X-Auth-Token']='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
 // GET REQUEST
 function getTodos() {
-  console.log('GET Request');
+  // axios({
+  //   method:"get",
+  //   url:'https://jsonplaceholder.typicode.com/todos',
+  //   params:{
+  //     _limit:5
+  //   }
+  // })
+  // .then(res => showOutput(res))
+  // .catch(err => console.error(err));
+
+  // axios.get('https://jsonplaceholder.typicode.com/todos',{
+  //   params:{ _limit:5 }
+  // })
+
+  axios
+  .get('https://jsonplaceholder.typicode.com/todos?_limit=5')
+  .then(res => showOutput(res))
+  .catch(err => console.error(err));
 }
 
 // POST REQUEST
 function addTodo() {
-  console.log('POST Request');
+  axios
+    .post('https://jsonplaceholder.typicode.com/todos',{
+      title : "New todo list",
+      completed : false })
+    .then(res => showOutput(res))
+    .catch(err => console.error(err));
 }
 
 // PUT/PATCH REQUEST
 function updateTodo() {
-  console.log('PUT/PATCH Request');
+  axios
+    .put('https://jsonplaceholder.typicode.com/todos/1',{
+      title : "Update todo list",
+      completed : true })
+    .then(res => showOutput(res))
+    .catch(err => console.error(err));
 }
 
 // DELETE REQUEST
 function removeTodo() {
-  console.log('DELETE Request');
+  axios
+    .delete('https://jsonplaceholder.typicode.com/todos/1')
+    .then(res => showOutput(res))
+    .catch(err => console.error(err));
 }
 
 // SIMULTANEOUS DATA
 function getData() {
-  console.log('Simultaneous Request');
+  axios.all([
+    axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5'),
+    axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
+  ])
+  .then(axios.spread((posts,todos)=>showOutput(posts)))
+  .catch(err => console.error(err));
 }
 
 // CUSTOM HEADERS
 function customHeaders() {
-  console.log('Custom Headers');
+  const config={
+    headers:{
+      'Content-Type': 'application/json',
+      Authorization:'Sometoken'
+    }
+  };
+  axios
+    .post('https://jsonplaceholder.typicode.com/todos',{
+      title : "New todo list",
+      completed : false }, config )
+    .then(res => showOutput(res))
+    .catch(err => console.error(err));
 }
 
 // TRANSFORMING REQUESTS & RESPONSES
 function transformResponse() {
-  console.log('Transform Response');
+  const option = {
+    method:'post',
+    url:'https://jsonplaceholder.typicode.com/todos',
+    data:{
+      title:'hello satya'
+    },
+    transformResponse: axios.defaults.transformResponse.concat(data =>{
+      data.title=data.title.toUpperCase();
+      return data;
+    })
+  };
+  axios(option).then(rest =>{showOutput(rest)});
 }
 
 // ERROR HANDLING
@@ -44,6 +102,14 @@ function cancelToken() {
 }
 
 // INTERCEPTING REQUESTS & RESPONSES
+axios.interceptors.request.use(
+  config =>{
+    console.log(`
+    ${config.method.toUpperCase()} requst send to ${config.url} at ${new Date().getTime()} `);
+    return config;
+  },
+error => { return Promise.reject(error); }
+);
 
 // AXIOS INSTANCES
 
